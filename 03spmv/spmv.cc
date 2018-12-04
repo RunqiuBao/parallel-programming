@@ -20,6 +20,25 @@
 #include "include/cuda_util.h"
 #endif
 
+/*runqiu:define new data type*/
+/*type of A for cuda
+typedef struct{
+  double * a;
+  double * a_dev;
+} A_cuda;
+
+/*type of vx for cuda
+typedef struct{
+  double * vx;
+  double * vx_dev;
+} vx_cuda;
+
+/*type of vy for cuda
+typedef struct{
+  double * vy;
+  double * vy_dev;
+} vy_cuda;
+
 /** @brief type of matrix index (i,j,...)
     @details 
     for large matrices, we might want to make it 64 bits.
@@ -1529,6 +1548,7 @@ static int spmv_coo_serial(sparse_t A, vec_t vx, vec_t vy) {
     @param (y) a vector
     @return 1 if succeed, 0 if failed
 */
+//runqiu:start pointing
 static int spmv_coo(spmv_algo_t algo, sparse_t A, vec_t x, vec_t y) {
   switch (algo) {
   case spmv_algo_serial:

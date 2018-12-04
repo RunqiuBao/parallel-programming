@@ -1,6 +1,5 @@
 app := spmv
 
-#
 # CPU options
 #
 cxxflags :=

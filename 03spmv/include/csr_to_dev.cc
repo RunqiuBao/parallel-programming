@@ -27,7 +27,15 @@ static int csr_to_dev(sparse_t& A) {
           "use dev_malloc and to_dev utility functions in cuda_util.h\n"
           "*************************************************************\n",
           __FILE__, __LINE__);
-  exit(1);
+  //exit(1);
+  /*runqiu:copying csr to device*/
+  cudaMalloc((void **)&A.csr.elems_dev, sz);
+  cudaMemcpy(A.csr.elems_dev, A.csr.elems, sz, cudaMemcpyHostToDevice);
+
+  cudaMalloc((void **)&A.csr.row_start_dev, sz);
+  cudaMemcpy(A.csr.row_start_dev, A.csr.row_start, sz, cudaMemcpyHostToDevice);
+
+
   return 1;
 }
 

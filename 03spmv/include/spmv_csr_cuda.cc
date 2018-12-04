@@ -20,9 +20,17 @@ static int spmv_csr_cuda(sparse_t A, vec_t vx, vec_t vy) {
           "using CUDA.\n"
           "*************************************************************\n",
           __FILE__, __LINE__);
-  exit(1);
+  //exit(1);
   
-  /* this is a serial code for your reference */
+  /*runqiu:using cuda computing SPMV with CSR format*/
+  if(1)//csr_to_dev(A) && vec_to_dev(vx) && vec_to_dev(vy)) //runqiu:transfer all the data to gpu, already in repeat_spmv
+  {  
+    int bs = 256;
+    int nb = (A.nnz + bs - 1) / bs;
+    spmv_csr_dev<<<nb,bs>>>(A, vx, vy);
+  }
+
+  /* this is a serial code for your reference
   idx_t M = A.M;
   idx_t * row_start = A.csr.row_start;
   csr_elem_t * elems = A.csr.elems;
@@ -40,6 +48,64 @@ static int spmv_csr_cuda(sparse_t A, vec_t vx, vec_t vy) {
       real  a = e->a;
       y[i] += a * x[j];
     }
-  }
+  } */
   return 1;
 }
+
+/*runqiu:kernel*/
+__global__ spmv_csr_dev(A, vx, vy){
+
+  kid = blockDim.x * blockIdx.x + threadIdx.x;//runqiu:thread id
+  idx_t M = A.M;
+  idx_t * row_start = A.csr.row_start_dev;
+  csr_elem_t * elems = A.csr.elems_dev;
+  real * x = vx.elems_dev;
+  real * y = vy.elems_dev;
+  if(kid<M){
+    //runqiu:tasks that every thread will do
+    y[kid] = 0.0;
+    idx_t start = row_start[kid];
+    idx_t end = row_start[kid + 1];
+    for (idx_t k = start; k < end; k++) {
+      csr_elem_t * e = elems + k;
+      idx_t j = e->j;
+      real  a = e->a;
+      atomicAdd(&y[i], a * x[j]);
+    }
+
+  }
+  
+}
+
+/*runqiu:nested kernel <https://blog.csdn.net/lingerlanlan/article/details/26258117>
+__global__ spmv_csr_dev(A, vx, vy){
+  
+  kid = blockDim.x * blockIdx.x + threadIdx.x;//runqiu:thread id
+  idx_t M = A.M;
+  idx_t * row_start = A.csr.row_start_dev;
+  csr_elem_t * elems = A.csr.elems_dev;
+  real * x = vx.elems_dev;
+  real * y = vy.elems_dev;
+  if(kid<M){
+    //runqiu:tasks that every thread will do
+    y[kid] = 0.0;
+    idx_t start = row_start[kid];
+    idx_t end = row_start[kid + 1];
+    int bs = 32;
+    int nb = (end-start + bs - 1) / bs;
+    nested_dev<<<bs,nb>>>(elems, y, end, start);
+  }
+  
+}
+
+__global__ nested_dev(elems, y){
+  knid = blockDim.x * blockIdx.x + threadIdx.x;
+  if(knid<lrow)
+  {
+    csr_elem_t * e = elems + start + knid;
+    idx_t j = e->j;
+    real  a = e->a;
+    atomicAdd(&y[i], a * x[j]);
+  }
+}
+*/
