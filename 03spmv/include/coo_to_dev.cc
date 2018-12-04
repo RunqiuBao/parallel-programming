@@ -28,7 +28,7 @@ static int coo_to_dev(sparse_t& A) {
           __FILE__, __LINE__);
   exit(1);*/
 
-  sparse_t * dst; //address on device
+  sparse_t& dst; //address on device
 
   //first get the size of A
   size_t sz = sparse_size(*A);
