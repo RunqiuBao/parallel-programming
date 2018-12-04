@@ -18,7 +18,7 @@ static int spmv_coo_parallel(sparse_t A, vec_t vx, vec_t vy) {
           "using parallel for + atomic directives\n"
           "*************************************************************\n",
           __FILE__, __LINE__);*/
-  #pragma omp parallel
+
   //int t = omp_get_thread_num();
   //int nt = opm_num_threads();
 
