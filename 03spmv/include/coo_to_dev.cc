@@ -17,7 +17,7 @@
     @sa sparse_to_dev
 */
 
-
+#include <cuda_util.h>
 static int coo_to_dev(sparse_t& A) {
   /*fprintf(stderr,
           "*************************************************************\n"
@@ -29,6 +29,11 @@ static int coo_to_dev(sparse_t& A) {
   exit(1);*/
 
   //sparse_t dst; //address on device
+    fprintf(stderr,
+            "*************************************************************\n"
+            "allocated1"
+            "*************************************************************\n",
+            __FILE__, __LINE__);
 
   //first get the size of A
   size_t sz = sparse_size(A);
