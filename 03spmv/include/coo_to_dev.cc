@@ -36,7 +36,7 @@ static int coo_to_dev(sparse_t& A) {
   //allocate the dev memory
   //dst = dev_malloc(sz);
   //copy the data to device
-  to_dev(dev_malloc(sz), A, sz);
+  to_dev(dev_malloc(sz), (void **)&A, sz);
 
   return 1;
 }
