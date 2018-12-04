@@ -17,7 +17,7 @@
     @sa sparse_to_dev
 */
 
-#include "cuda_util.h"
+
 static int coo_to_dev(sparse_t& A) {
   /*fprintf(stderr,
           "*************************************************************\n"
