@@ -16,15 +16,27 @@
     the parameter.
     @sa sparse_to_dev
 */
+
+
 static int coo_to_dev(sparse_t& A) {
-  fprintf(stderr,
+  /*fprintf(stderr,
           "*************************************************************\n"
           "%s:%d:coo_to_dev:\n"
           "write a code that copies the elements of csr to the device.\n"
           "use dev_malloc and to_dev utility functions in cuda_util.h\n"
           "*************************************************************\n",
           __FILE__, __LINE__);
-  exit(1);
+  exit(1);*/
+
+  sparse_t * dst; //address on device
+
+  //first get the size of A
+  size_t sz = sparse_size(*A);
+
+  //allocate the dev memory
+  dst = dev_malloc(sz);
+  //copy the data to device
+  to_dev(dst, A, sz);
+
   return 1;
 }
-
