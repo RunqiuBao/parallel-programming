@@ -28,15 +28,15 @@ static int coo_to_dev(sparse_t& A) {
           __FILE__, __LINE__);
   exit(1);*/
 
-  sparse_t& dst; //address on device
+  //sparse_t dst; //address on device
 
   //first get the size of A
   size_t sz = sparse_size(*A);
 
   //allocate the dev memory
-  dst = dev_malloc(sz);
+  //dst = dev_malloc(sz);
   //copy the data to device
-  to_dev(dst, A, sz);
+  to_dev(dev_malloc(sz), A, sz);
 
   return 1;
 }
