@@ -23,7 +23,6 @@ static real vec_norm2_parallel(vec_t v) {
   real s = 0.0;
   real * x = v.elems;
   idx_t n = v.n;
-  //#pragma omp declare reduction (sp: real: s_add (&omp_out, &opm_in))
   #pragma omp parallel for reduction (+ : s)
   for (idx_t i = 0; i < n; i++) {
     s += x[i] * x[i];

@@ -17,10 +17,9 @@ static int spmv_coo_parallel(sparse_t A, vec_t vx, vec_t vy) {
           "write a code that performs SPMV for COO format in parallel\n"
           "using parallel for + atomic directives\n"
           "*************************************************************\n",
-          __FILE__, __LINE__);*/
-
-  //int t = omp_get_thread_num();
-  //int nt = opm_num_threads();
+          __FILE__, __LINE__);
+　exit(1);
+*/
 
   idx_t M = A.M;
   idx_t nnz = A.nnz;
@@ -32,9 +31,6 @@ static int spmv_coo_parallel(sparse_t A, vec_t vx, vec_t vy) {
   }
   #pragma omp for
   for (idx_t k = 0; k < nnz; k++) {
-      //i,j, Aij = A.elems[k];
-      //#pragma omp atomic
-      //y[i] += Aij * x[j];
       coo_elem_t * e = elems + k;
       idx_t i = e->i;
       idx_t j = e->j;
@@ -44,9 +40,6 @@ static int spmv_coo_parallel(sparse_t A, vec_t vx, vec_t vy) {
       y[i] += ax;
   }
   return 1;
-
-
-  //exit(1);
 
   /* this is a serial code for your reference */
   /*
