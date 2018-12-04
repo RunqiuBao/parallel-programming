@@ -31,12 +31,17 @@ static int coo_to_dev(sparse_t& A) {
   //sparse_t dst; //address on device
     fprintf(stderr,
             "*************************************************************\n"
-            "allocated1"
+            "allocating\n"
             "*************************************************************\n",
             __FILE__, __LINE__);
 
   //first get the size of A
   size_t sz = sparse_size(A);
+  fprintf(stderr,
+          "*************************************************************\n"
+          "allocating1\n"
+          "*************************************************************\n",
+          __FILE__, __LINE__);
 
   //allocate the dev memory
   //dst = dev_malloc(sz);
