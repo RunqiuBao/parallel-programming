@@ -31,7 +31,7 @@ static int coo_to_dev(sparse_t& A) {
   //sparse_t dst; //address on device
 
   //first get the size of A
-  size_t sz = sparse_size(*A);
+  size_t sz = sparse_size(A);
 
   //allocate the dev memory
   //dst = dev_malloc(sz);
