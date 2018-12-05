@@ -19,7 +19,7 @@ __global__ void vec_norm2_dev(vec_t v, real * s) {
   idx_t n = v.n;
   if(k < n) {
     //s += x[i] * x[i];
-    atomicAdd(s, x[i] * x[i]);
+    atomicAdd(s, x[k] * x[k]);
   }
 
 }
@@ -39,7 +39,7 @@ static real vec_norm2_cuda(vec_t v) {
           __FILE__, __LINE__);
   exit(1);*/
   int nb, bs;
-  real * s;
+  real s;
 
   nb = 256;
   bs = 1024;
