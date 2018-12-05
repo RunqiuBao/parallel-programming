@@ -45,7 +45,6 @@ static real vec_norm2_cuda(vec_t v) {
   bs = 1024;
 
   vec_norm2_dev<<<nb, bs>>>(v, &s);
-
   return s;
   /*real s = 0.0;
   real * x = v.elems;
