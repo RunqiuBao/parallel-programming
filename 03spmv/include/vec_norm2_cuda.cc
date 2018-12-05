@@ -11,7 +11,17 @@
     to a device memory
 */
 __global__ void vec_norm2_dev(vec_t v, real * s) {
-  
+
+  int k;
+  k = blockDim.x * blockIdx.x + threadIdx.x; // thread id
+
+  real * x = v.elems;
+  idx_t n = v.n;
+  if(k < n) {
+    //s += x[i] * x[i];
+    atomicAdd(s, x[i] * x[i]);
+  }
+
 }
 
 /** 
@@ -20,20 +30,28 @@ __global__ void vec_norm2_dev(vec_t v, real * s) {
     @returns the square norm of v (v[0]^2 + ... + v[n-1]^2)
 */
 static real vec_norm2_cuda(vec_t v) {
-  fprintf(stderr,
+  /*fprintf(stderr,
           "*************************************************************\n"
           "%s:%d:vec_norm2_cuda:\n"
           "write a code that computes square norm of a vector v\n"
           "using CUDA.\n"
           "*************************************************************\n",
           __FILE__, __LINE__);
-  exit(1);
+  exit(1);*/
+  int nb, bs;
+  real * s;
 
-  real s = 0.0;
+  nb = 256;
+  bs = 1024;
+
+  vec_norm2_dev<<<nb, bs>>>(v, &s);
+
+  return s;
+  /*real s = 0.0;
   real * x = v.elems;
   idx_t n = v.n;
   for (idx_t i = 0; i < n; i++) {
     s += x[i] * x[i];
   }
-  return s;
+  return s;*/
 }

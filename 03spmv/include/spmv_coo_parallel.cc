@@ -29,7 +29,7 @@ static int spmv_coo_parallel(sparse_t A, vec_t vx, vec_t vy) {
   for (idx_t i = 0; i < M; i++) {
     y[i] = 0.0;
   }
-  #pragma omp for
+  #pragma omp parallel for
   for (idx_t k = 0; k < nnz; k++) {
       coo_elem_t * e = elems + k;
       idx_t i = e->i;
