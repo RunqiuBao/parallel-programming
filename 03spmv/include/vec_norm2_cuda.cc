@@ -55,4 +55,4 @@ static real vec_norm2_cuda(vec_t v) {
   }
   return s;*/
 }
-cd
+
