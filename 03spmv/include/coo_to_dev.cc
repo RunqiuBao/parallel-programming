@@ -36,7 +36,7 @@ static int coo_to_dev(sparse_t& A) {
             __FILE__, __LINE__);
 
   //first get the size of A
-  size_t sz = sizeof(A.coo.elems);
+  size_t sz = sizeof(*(A.coo.elems));
   fprintf(stderr,
             "*************************************************************\n"
             "got the size\n"

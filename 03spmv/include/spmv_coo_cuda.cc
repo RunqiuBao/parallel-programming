@@ -25,24 +25,24 @@ __global__ void init_const_dev(vec_t v, real c) {
 __global__ void spmv_coo_dev(sparse_t A, vec_t vx, vec_t vy) {
     idx_t M = A.M;
     idx_t nnz = A.nnz;
-    coo_elem_t * elems = A.coo.elems;
-    real * x = vx.elems;
-    real * y = vy.elems;
+    coo_elem_t * elems_dev = A.coo.elems_dev;
+    real * x_dev = vx.elems_dev;
+    real * y_dev = vy.elems_dev;
     for (idx_t i = 0; i < M; i++) {
-      y[i] = 0.0;
+      y_dev[i] = 0.0;
     }
 
     int k;
     k = blockDim.x * blockIdx.x + threadIdx.x; // thread id
 
     if(k < nnz) {
-      coo_elem_t * e = elems + k;
+      coo_elem_t * e = elems_dev + k;
       idx_t i = e->i;
       idx_t j = e->j;
       real  a = e->a;
-      real ax = a * x[j];
+      real ax = a * x_dev[j];
       //y[i] += ax;
-      atomicAdd(&y[i], ax);
+      atomicAdd(&y_dev[i], ax);
     }
 }
 

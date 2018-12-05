@@ -15,11 +15,11 @@ __global__ void vec_norm2_dev(vec_t v, real * s) {
   int k;
   k = blockDim.x * blockIdx.x + threadIdx.x; // thread id
 
-  real * x = v.elems;
+  real * x_dev = v.elems_dev;
   idx_t n = v.n;
   if(k < n) {
     //s += x[i] * x[i];
-    atomicAdd(s, x[k] * x[k]);
+    atomicAdd(s, x_dev[k] * x_dev[k]);
   }
 
 }
@@ -55,3 +55,4 @@ static real vec_norm2_cuda(vec_t v) {
   }
   return s;*/
 }
+cd
