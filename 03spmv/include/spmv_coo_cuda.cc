@@ -32,14 +32,17 @@ __global__ void spmv_coo_dev(sparse_t A, vec_t vx, vec_t vy) {
       y[i] = 0.0;
     }
 
-    for (idx_t k = 0; k < nnz; k++) {
+    int k;
+    k = blockDim.x * blockIdx.x + threadIdx.x; // thread id
+
+    if(k < nnz) {
       coo_elem_t * e = elems + k;
       idx_t i = e->i;
       idx_t j = e->j;
       real  a = e->a;
       real ax = a * x[j];
       //y[i] += ax;
-      atomicAdd(y[i], x);
+      atomicAdd(&y[i], ax);
     }
 }
 
