@@ -10,7 +10,7 @@
     @param (c) the value to initialize all v's elements with
 */
 __global__ void init_const_dev(vec_t v, real c) {
-  v.elems = {c};
+  //v.elems = {c};
 }
 
 /** 
@@ -62,6 +62,7 @@ static int spmv_coo_cuda(sparse_t A, vec_t vx, vec_t vy) {
           "*************************************************************\n",
           __FILE__, __LINE__);
   exit(1);*/
+  int nb, bs;
   nb = 256;
   bs = 1024;
 
