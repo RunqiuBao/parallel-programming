@@ -39,12 +39,18 @@ static real vec_norm2_cuda(vec_t v) {
           __FILE__, __LINE__);
   exit(1);*/
   int nb, bs;
+
   real s;
+#ifdef __NVCC__
+  real s_dev;
+#endif
 
   nb = 256;
   bs = 1024;
 
-  vec_norm2_dev<<<nb, bs>>>(v, &s);
+  vec_norm2_dev<<<nb, bs>>>(v, &s_dev);
+
+  to_host((void *)&s, (void *)&s_dev, sizeof(s_dev));
   return s;
   /*real s = 0.0;
   real * x = v.elems;

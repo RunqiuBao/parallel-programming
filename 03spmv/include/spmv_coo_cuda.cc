@@ -22,7 +22,7 @@ __global__ void init_const_dev(vec_t v, real c) {
 */
 
 
-__global__ void spmv_coo_dev(sparse_t A, vec_t vx, vec_t vy) {
+__global__ void spmv_coo_dev(sparse_t A, vec_t vx, vec_t& vy) {
     idx_t M = A.M;
     idx_t nnz = A.nnz;
     coo_elem_t * elems_dev = A.coo.elems_dev;
@@ -53,7 +53,7 @@ __global__ void spmv_coo_dev(sparse_t A, vec_t vx, vec_t vy) {
     @param (vy) a vector
     @returns 1 if succeed, 0 if failed
 */
-static int spmv_coo_cuda(sparse_t A, vec_t vx, vec_t vy) {
+static int spmv_coo_cuda(sparse_t A, vec_t vx, vec_t& vy) {
   /*fprintf(stderr,
           "*************************************************************\n"
           "%s:%d:spmv_coo_cuda:\n"
@@ -67,6 +67,8 @@ static int spmv_coo_cuda(sparse_t A, vec_t vx, vec_t vy) {
   bs = 1024;
 
   spmv_coo_dev<<<nb, bs>>>(A, vx, vy);
+
+  to_host(vy.elems, vy.elems_dev, sizeof(*(vy,elems_dev)));
 
   /* this is a serial code for your reference */
   /*idx_t M = A.M;
