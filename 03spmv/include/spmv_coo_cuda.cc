@@ -10,7 +10,10 @@
     @param (c) the value to initialize all v's elements with
 */
 __global__ void init_const_dev(vec_t v, real c) {
-  //v.elems = {c};
+   int k = blockDim.x * blockIdx.x + threadIdx.x;
+   real * y_dev = vy.elems_dev; 
+   if (k < v.n)
+     y_dev[k] = c;
 }
 
 /** 
@@ -68,9 +71,12 @@ static int spmv_coo_cuda(sparse_t A, vec_t vx, vec_t vy) {
   bs = 256;
   nb = (A.nnz + bs - 1)/bs;
   printf("gonna enter the kernel\n");
+  init_const_dev<<<nb, bs>>>(vy, 0.0);
+  to_host((void *)vy.elems, (void *)vy.elems_dev, vy.n * sizeof(real));
+  
   spmv_coo_dev<<<nb, bs>>>(A, vx, vy);
   printf("out from kernel\n");
-  to_host((void * )vy.elems, (void *)vy.elems_dev, vy.n * sizeof(real));
+  to_host((void *)vy.elems, (void *)vy.elems_dev, vy.n * sizeof(real));
   printf("spmv calclulation ended\n");
   /* this is a serial code for your reference */
   /*idx_t M = A.M;
