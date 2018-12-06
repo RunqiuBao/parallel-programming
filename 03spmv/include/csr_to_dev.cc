@@ -29,11 +29,11 @@ static int csr_to_dev(sparse_t& A) {
           __FILE__, __LINE__);
   //exit(1);
   /*runqiu:copying csr to device*/
-  check_api_error(cudaMalloc((void **)&A.csr.elems_dev, sizeof(*(A.csr.elems))*A.nnz));
-  check_api_error(cudaMemcpy(A.csr.elems_dev, A.csr.elems, sizeof(*(A.csr.elems))*A.nnz, cudaMemcpyHostToDevice));
+  check_api_error((cudaMalloc((void **)&A.csr.elems_dev, sizeof(*(A.csr.elems))*A.nnz)));
+  check_api_error((cudaMemcpy(A.csr.elems_dev, A.csr.elems, sizeof(*(A.csr.elems))*A.nnz, cudaMemcpyHostToDevice)));
 
-  check_api_error(cudaMalloc((void **)&A.csr.row_start_dev, sizeof(int)*A.M));
-  check_api_error(cudaMemcpy(A.csr.row_start_dev, A.csr.row_start, sizeof(int)*A.M, cudaMemcpyHostToDevice));
+  check_api_error((cudaMalloc((void **)&A.csr.row_start_dev, sizeof(int)*A.M)));
+  check_api_error((cudaMemcpy(A.csr.row_start_dev, A.csr.row_start, sizeof(int)*A.M, cudaMemcpyHostToDevice)));
 
 
   return 1;
