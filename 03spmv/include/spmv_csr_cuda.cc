@@ -13,14 +13,14 @@
 
 /*runqiu:kernel*/
 __global__
-void spmv_csr_dev(sparse_t & A, vec_t & vx, vec_t & vy){
+void spmv_csr_dev(idx_t * AMdev, idx_t * Acsrrsd, csr_elem_t * Acsrelemsdev, real * vxelemsdev, real * vyelemsdev){
 
   int kid = blockDim.x * blockIdx.x + threadIdx.x;//runqiu:thread id
-  idx_t M = A.M;
-  idx_t * row_start = A.csr.row_start_dev;
-  csr_elem_t * elems = A.csr.elems_dev;
-  real * x = vx.elems_dev;
-  real * y = vy.elems_dev;
+  idx_t M = *AMdev;
+  idx_t * row_start = Acsrrsd;
+  csr_elem_t * elems = Acsrelemsdev;
+  real * x = vxelemsdev;
+  real * y = vyelemsdev;
   if(kid<M){
     //runqiu:tasks that every thread will do
     y[kid] = 0.0;
@@ -28,7 +28,7 @@ void spmv_csr_dev(sparse_t & A, vec_t & vx, vec_t & vy){
     idx_t end = row_start[kid + 1];
     for (idx_t k = start; k < end; k++) {
       csr_elem_t * e = elems + k;
-     //idx_t j = e->j;
+      //idx_t j = e->j;
       real  a = e->a;
       atomicAdd(&y[kid], a * x[k]);
     }
@@ -53,7 +53,12 @@ static int spmv_csr_cuda(sparse_t A, vec_t vx, vec_t vy) {
   {  
     int bs = 256;
     int nb = (A.nnz + bs - 1) / bs;
-    check_launch_error((spmv_csr_dev<<<nb,bs>>>(A, vx, vy)));
+
+    idx_t *AM=&A.M;
+    idx_t *AM_dev;
+    AM_dev=(idx_t*)dev_malloc(sizeof(idx_t));
+    to_dev(AM_dev, AM, sizeof(idx_t));
+    check_launch_error((spmv_csr_dev<<<nb,bs>>>(AM_dev, A.csr.row_start_dev, A.csr.elems_dev, vx.elems_dev, vy.elems_dev)));
     printf("spmv-csr succeed!");
     //check_api_error(());
     //vy.elems = (real*)malloc(sizeof(real)*A.M);
