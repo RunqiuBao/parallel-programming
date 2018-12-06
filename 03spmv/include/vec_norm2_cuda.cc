@@ -10,7 +10,18 @@
     @details assume v.elems_dev already set and s a proper pointer
     to a device memory
 */
-__global__ void vec_norm2_dev(vec_t v, real * s) {
+__global__ void vec_norm2_dev(real * velemsdev, idx_t * vn, real * s) {
+
+  int k;
+  k = blockDim.x * blockIdx.x + threadIdx.x; // thread id
+
+  real * x_dev = velemsdev;
+  idx_t n = *vn;
+  if(k < n) {
+    //s += x[i] * x[i];
+    atomicAdd(s, x_dev[k] * x_dev[k]);
+  }
+
   
 }
 
@@ -27,13 +38,36 @@ static real vec_norm2_cuda(vec_t v) {
           "using CUDA.\n"
           "*************************************************************\n",
           __FILE__, __LINE__);
-  exit(1);
+  //exit(1);
 
-  real s = 0.0;
+  int nb,bs;
+  vec_t s;
+  s.n=1;
+  real temp=0.0;
+  s.elems=&temp;
+  
+  idx_t *temp3=&v.n;
+  idx_t *temp3_dev;
+  nb=256;
+  bs=1024;
+  
+  vec_to_dev(s);
+  vec_to_dev(v);
+  check_api_error((cudaMalloc((void **)&temp3_dev, sizeof(idx_t))));
+  check_api_error((cudaMemcpy(temp3_dev, temp3, sizeof(idx_t), cudaMemcpyHostToDevice)));
+
+  check_launch_error((vec_norm2_dev<<<nb,bs>>>(v.elems_dev, temp3, s.elems_dev)));
+  real *temp2;
+  temp2=(real*)malloc(sizeof(real));
+  check_api_error((cudaMemcpy(temp2, s.elems_dev, sizeof(real),cudaMemcpyHostToDevice)));
+  printf("s to dev, succeed!:%f",*temp2);
+
+  return *temp2; 
+  /*real s = 0.0;
   real * x = v.elems;
   idx_t n = v.n;
   for (idx_t i = 0; i < n; i++) {
     s += x[i] * x[i];
   }
-  return s;
+  return s;*/
 }

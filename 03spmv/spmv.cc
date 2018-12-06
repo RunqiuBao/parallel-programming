@@ -27,19 +27,19 @@ typedef struct{
   double * a_dev;
 } A_cuda;
 
-/*type of vx for cuda
+type of vx for cuda
 typedef struct{
   double * vx;
   double * vx_dev;
 } vx_cuda;
 
-/*type of vy for cuda
+type of vy for cuda
 typedef struct{
   double * vy;
   double * vy_dev;
 } vy_cuda;
 
-/** @brief type of matrix index (i,j,...)
+* @brief type of matrix index (i,j,...)
     @details 
     for large matrices, we might want to make it 64 bits.
  */

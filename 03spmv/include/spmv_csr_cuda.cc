@@ -11,6 +11,32 @@
     @returns 1 if succeed, 0 if failed
 */
 
+/*runqiu:kernel*/
+__global__
+void spmv_csr_dev(sparse_t & A, vec_t & vx, vec_t & vy){
+
+  int kid = blockDim.x * blockIdx.x + threadIdx.x;//runqiu:thread id
+  idx_t M = A.M;
+  idx_t * row_start = A.csr.row_start_dev;
+  csr_elem_t * elems = A.csr.elems_dev;
+  real * x = vx.elems_dev;
+  real * y = vy.elems_dev;
+  if(kid<M){
+    //runqiu:tasks that every thread will do
+    y[kid] = 0.0;
+    idx_t start = row_start[kid];
+    idx_t end = row_start[kid + 1];
+    for (idx_t k = start; k < end; k++) {
+      csr_elem_t * e = elems + k;
+     //idx_t j = e->j;
+      real  a = e->a;
+      atomicAdd(&y[kid], a * x[k]);
+    }
+
+  }
+
+}
+
 static int spmv_csr_cuda(sparse_t A, vec_t vx, vec_t vy) {
 
   fprintf(stderr,
@@ -27,7 +53,11 @@ static int spmv_csr_cuda(sparse_t A, vec_t vx, vec_t vy) {
   {  
     int bs = 256;
     int nb = (A.nnz + bs - 1) / bs;
-    spmv_csr_dev<<<nb,bs>>>(A, vx, vy);
+    check_launch_error((spmv_csr_dev<<<nb,bs>>>(A, vx, vy)));
+    printf("spmv-csr succeed!");
+    //check_api_error(());
+    //vy.elems = (real*)malloc(sizeof(real)*A.M);
+    //check_api_error((cudaMemcpy(vy.elems, vy.elems_dev, sizeof(real)*A.M, cudaMemcpyDeviceToHost)));
   }
 
   /* this is a serial code for your reference
@@ -50,31 +80,6 @@ static int spmv_csr_cuda(sparse_t A, vec_t vx, vec_t vy) {
     }
   } */
   return 1;
-}
-
-/*runqiu:kernel*/
-__global__ spmv_csr_dev(A, vx, vy){
-
-  kid = blockDim.x * blockIdx.x + threadIdx.x;//runqiu:thread id
-  idx_t M = A.M;
-  idx_t * row_start = A.csr.row_start_dev;
-  csr_elem_t * elems = A.csr.elems_dev;
-  real * x = vx.elems_dev;
-  real * y = vy.elems_dev;
-  if(kid<M){
-    //runqiu:tasks that every thread will do
-    y[kid] = 0.0;
-    idx_t start = row_start[kid];
-    idx_t end = row_start[kid + 1];
-    for (idx_t k = start; k < end; k++) {
-      csr_elem_t * e = elems + k;
-      idx_t j = e->j;
-      real  a = e->a;
-      atomicAdd(&y[i], a * x[j]);
-    }
-
-  }
-  
 }
 
 /*runqiu:nested kernel <https://blog.csdn.net/lingerlanlan/article/details/26258117>

@@ -20,8 +20,8 @@ static int vec_to_dev(vec_t& v) {
           __FILE__, __LINE__);
 
   /*runqiu:copying vec to device*/
-  cudaMalloc((void **)&v.elems_dev, sz);
-  cudaMemcpy(v.elems_dev, v.elems, sz, cudaMemcpyHostToDevice);
+  cudaMalloc((void **)&v.elems_dev, sizeof(real)*v.n);
+  cudaMemcpy(v.elems_dev, v.elems, sizeof(real)*v.n, cudaMemcpyHostToDevice);
   
   return 1;
 }
