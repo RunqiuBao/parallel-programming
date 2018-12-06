@@ -1857,18 +1857,15 @@ static real repeat_spmv(spmv_algo_t algo,
   fflush(stdout);
   long t0 = cur_time_ns();
   /* y = A x and check error */
-  if (!spmv(algo, A, x, y)){
-    printf("first call\n");
-    return -1.0;}
+  if (!spmv(algo, A, x, y))
+    return -1.0;
   /* x = tA y and check error */
-  if (!spmv(algo, tA, y, x)){
-    printf("second call/n"); 
-    return -1.0;}
+  if (!spmv(algo, tA, y, x))
+    return -1.0;
   /* x = x/|x| and check error */
   printf("cal num next/n");
-  if (vec_normalize(algo, x) < 0.0){
-    printf("num caled/n");
-    return -1.0;}
+  if (vec_normalize(algo, x) < 0.0)
+    return -1.0;
   long t1 = cur_time_ns();
   printf("%s:%d:repeat_spmv: warm up + error check ends. took %.3f sec\n",
          __FILE__, __LINE__, (t1 - t0) * 1.0e-9);

@@ -11,12 +11,12 @@
     to a device memory
 */
 
-typedef struct{
+/*typedef struct{
   real * s;
 #ifdef __NVCC__
   real * s_dev;
 #endif
-}real_t;
+}real_t;*/
 
 __global__ void vec_norm2_dev(vec_t v, real * s) {
 
@@ -51,12 +51,13 @@ static real vec_norm2_cuda(vec_t v) {
   int nb, bs;
   real * s;
   real * s_dev;
-  *s = 0.0;
+  real tmp = 0.0;
+  s = &tmp;
   s_dev =(real *)dev_malloc(sizeof(real));
   to_dev((void *)s_dev, (void *)s, sizeof(real));
 
-  nb = 256;
-  bs = 1024;
+  bs = 256;
+  nb = (v.n + bs -1)/256;
   printf("debug0\n");
   vec_norm2_dev<<<nb, bs>>>(v, s_dev);
   printf("debug1\n");

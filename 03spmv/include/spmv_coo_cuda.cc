@@ -65,8 +65,8 @@ static int spmv_coo_cuda(sparse_t A, vec_t vx, vec_t vy) {
           __FILE__, __LINE__);
   exit(1);*/
   int nb, bs;
-  nb = 256;
-  bs = 1024;
+  bs = 256;
+  nb = (A.nnz + bs - 1)/bs;
   printf("gonna enter the kernel\n");
   spmv_coo_dev<<<nb, bs>>>(A, vx, vy);
   printf("out from kernel\n");
