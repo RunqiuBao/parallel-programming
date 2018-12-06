@@ -23,14 +23,14 @@ __global__ void init_const_dev(vec_t v, real c) {
 
 
 __global__ void spmv_coo_dev(sparse_t A, vec_t vx, vec_t vy) {
-    idx_t M = A.M;
+    //idx_t M = A.M;
     idx_t nnz = A.nnz;
     coo_elem_t * elems_dev = A.coo.elems_dev;
     real * x_dev = vx.elems_dev;
     real * y_dev = vy.elems_dev;
-    for (idx_t i = 0; i < M; i++) {
-      y_dev[i] = 0.0;
-    }
+    //for (idx_t i = 0; i < M; i++) {
+    //  y_dev[i] = 0.0;
+    //}
 
     int k;
     k = blockDim.x * blockIdx.x + threadIdx.x; // thread id
@@ -43,6 +43,7 @@ __global__ void spmv_coo_dev(sparse_t A, vec_t vx, vec_t vy) {
       real ax = a * x_dev[j];
       //y[i] += ax;
       atomicAdd(&y_dev[i], ax);
+      printf("calculated\n");
     }
 
 }
@@ -66,11 +67,11 @@ static int spmv_coo_cuda(sparse_t A, vec_t vx, vec_t vy) {
   int nb, bs;
   nb = 256;
   bs = 1024;
-
+  printf("gonna enter the kernel\n");
   spmv_coo_dev<<<nb, bs>>>(A, vx, vy);
-
-  to_host((void * )vy.elems, (void *)vy.elems_dev, sizeof(*(vy,elems_dev)));
-
+  printf("out from kernel\n");
+  to_host((void * )vy.elems, (void *)vy.elems_dev, vy.n * sizeof(real));
+  printf("spmv calclulation ended\n");
   /* this is a serial code for your reference */
   /*idx_t M = A.M;
   idx_t nnz = A.nnz;

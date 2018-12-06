@@ -27,7 +27,7 @@ static int vec_to_dev(vec_t& v) {
               __FILE__, __LINE__);
 
     //first get the size of A
-    size_t sz = sizeof(*(v.elems));
+    size_t sz = v.n * sizeof(real);
     fprintf(stderr,
               "*************************************************************\n"
               "v got the size\n"
