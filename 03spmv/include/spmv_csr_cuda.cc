@@ -29,12 +29,12 @@ void spmv_csr_dev(idx_t * AMdev, idx_t * Acsrrsd, csr_elem_t * Acsrelemsdev, rea
     for (idx_t k = start; k < end; k++) {
       csr_elem_t * e = elems + k;
       //idx_t j = e->j;
-      real  a = e->a;
+      real a = e->a;
       atomicAdd(&y[kid], a * x[k]);
     }
 
   }
-
+  printf("one thread finish!");
 }
 
 static int spmv_csr_cuda(sparse_t A, vec_t vx, vec_t vy) {
@@ -57,11 +57,14 @@ static int spmv_csr_cuda(sparse_t A, vec_t vx, vec_t vy) {
     idx_t *AM=&A.M;
     idx_t *AM_dev;
     AM_dev=(idx_t*)dev_malloc(sizeof(idx_t));
-    to_dev(AM_dev, AM, sizeof(idx_t));
+    to_dev((void*)AM_dev, (void*)AM, sizeof(idx_t));
     check_launch_error((spmv_csr_dev<<<nb,bs>>>(AM_dev, A.csr.row_start_dev, A.csr.elems_dev, vx.elems_dev, vy.elems_dev)));
-    printf("spmv-csr succeed!");
-    //check_api_error(());
-    //vy.elems = (real*)malloc(sizeof(real)*A.M);
+    printf("spmv-csr succeed!");   
+
+    vy.elems=(real*)malloc(sizeof(real)*A.M);
+    printf("vy.elems malloc succeed!");
+    to_host((void*)vy.elems, (void*)vy.elems_dev, sizeof(real)*A.M); 
+    printf("receive vy succeed!");
     //check_api_error((cudaMemcpy(vy.elems, vy.elems_dev, sizeof(real)*A.M, cudaMemcpyDeviceToHost)));
   }
 

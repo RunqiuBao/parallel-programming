@@ -21,7 +21,7 @@ static int vec_to_dev(vec_t& v) {
 
   /*runqiu:copying vec to device*/
   v.elems_dev=(real*)dev_malloc(sizeof(real)*v.n);
-  to_dev(v.elems_dev, v.elems, sizeof(real)*v.n);
+  to_dev((void*)v.elems_dev, (void*)v.elems, sizeof(real)*v.n);
   //check_api_error((cudaMalloc((void **)&v.elems_dev, sizeof(real)*v.n)));
   //check_api_error((cudaMemcpy(v.elems_dev, v.elems, sizeof(real)*v.n, cudaMemcpyHostToDevice)));
   
