@@ -50,8 +50,8 @@ static real vec_norm2_cuda(vec_t v) {
 
   idx_t *temp3=&v.n;
   idx_t *temp3_dev;
-  nb=256;
-  bs=1024;
+  bs=256;
+  nb=(v.n+bs-1)/bs;
   
   vec_to_dev(v);
   temp3_dev=(idx_t*)dev_malloc(sizeof(idx_t));
