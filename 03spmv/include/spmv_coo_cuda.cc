@@ -42,7 +42,7 @@ __global__ void spmv_coo_dev(sparse_t A, vec_t vx, vec_t vy) {
       real  a = e->a;
       real ax = a * x_dev[j];
       //y[i] += ax;
-      atomicAdd(y_dev[i], ax);
+      atomicAdd(&y_dev[i], ax);
     }
 
 }
