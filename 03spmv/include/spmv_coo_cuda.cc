@@ -44,6 +44,7 @@ __global__ void spmv_coo_dev(sparse_t A, vec_t vx, vec_t& vy) {
       //y[i] += ax;
       atomicAdd(&y_dev[i], ax);
     }
+    to_host(vy.elems, vy.elems_dev, sizeof(*(vy,elems_dev)));
 }
 
 /** 
@@ -68,7 +69,7 @@ static int spmv_coo_cuda(sparse_t A, vec_t vx, vec_t& vy) {
 
   spmv_coo_dev<<<nb, bs>>>(A, vx, vy);
 
-  to_host(vy.elems, vy.elems_dev, sizeof(*(vy,elems_dev)));
+
 
   /* this is a serial code for your reference */
   /*idx_t M = A.M;
