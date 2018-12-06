@@ -10,22 +10,13 @@
     @details assume v.elems_dev already set and s a proper pointer
     to a device memory
 */
-
-typedef struct{
-  real * s;
-#ifdef __NVCC__
-  real * s_dev;
-#endif
-}real_t;
-
 __global__ void vec_norm2_dev(vec_t v, real * s) {
 
   int k;
   k = blockDim.x * blockIdx.x + threadIdx.x; // thread id
-  printf("in norm kernel\n");
+
   real * x_dev = v.elems_dev;
   idx_t n = v.n;
-
   if(k < n) {
     //s += x[i] * x[i];
     atomicAdd(s, x_dev[k] * x_dev[k]);
@@ -47,22 +38,20 @@ static real vec_norm2_cuda(vec_t v) {
           "*************************************************************\n",
           __FILE__, __LINE__);
   exit(1);*/
-  printf("to calculate the norm\n");
   int nb, bs;
-  real * s;
-  real * s_dev;
-  *s = 0.0;
-  s_dev =(real *)dev_malloc(sizeof(real));
-  to_dev((void *)s_dev, (void *)s, sizeof(real));
+
+  real s;
+#ifdef __NVCC__
+  real s_dev;
+#endif
 
   nb = 256;
   bs = 1024;
-  printf("debug0\n");
-  vec_norm2_dev<<<nb, bs>>>(v, s_dev);
-  printf("debug1\n");
-  to_host((void *)s, (void *)s_dev, sizeof(real));
-  printf("copied s to host\n"); 
-  return *s;
+
+  vec_norm2_dev<<<nb, bs>>>(v, &s_dev);
+
+  to_host((void *)&s, (void *)&s_dev, sizeof(s_dev));
+  return s;
   /*real s = 0.0;
   real * x = v.elems;
   idx_t n = v.n;
