@@ -19,9 +19,9 @@ static int spmv_csr_parallel(sparse_t A, vec_t vx, vec_t vy) {
           "using parallel for directives.\n"
           "*************************************************************\n",
           __FILE__, __LINE__);
-  exit(1);
+  //exit(1);
   
-  /* this is a serial code for your reference */
+  /* this is a serial code for your reference
   idx_t M = A.M;
   idx_t * row_start = A.csr.row_start;
   csr_elem_t * elems = A.csr.elems;
@@ -39,6 +39,29 @@ static int spmv_csr_parallel(sparse_t A, vec_t vx, vec_t vy) {
       real  a = e->a;
       y[i] += a * x[j];
     }
+  }
+  return 1;*/
+  idx_t M = A.M;
+  //idx_t nnz = A.nnz;
+  idx_t * row_start = A.csr.row_start;
+  csr_elem_t * elems = A.csr.elems;
+  real * x = vx.elems;
+  real * y = vy.elems;
+  for (idx_t i = 0; i < M; i++) {
+    y[i] = 0.0;
+  }
+  #pragma omp parallel for
+  for (idx_t k = 0; k < M; k++) {
+      idx_t start=row_start[k];
+      idx_t end=row_start[k+1];
+      for(idx_t k2=start; k2<end; k2++){
+        csr_elem_t * e = elems + k2;
+        idx_t j = e->j;
+        real  a = e->a;
+        #pragma omp atomic
+        y[k] += a * x[j];
+      }
+
   }
   return 1;
 }
