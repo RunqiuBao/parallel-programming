@@ -56,15 +56,11 @@ static real vec_norm2_cuda(vec_t v) {
   vec_to_dev(v);
   temp3_dev=(idx_t*)dev_malloc(sizeof(idx_t));
   to_dev((void*)temp3_dev, (void*)temp3, sizeof(idx_t));
-  //check_api_error((cudaMalloc((void **)&temp3_dev, sizeof(idx_t))));
-  //check_api_error((cudaMemcpy(temp3_dev, temp3, sizeof(idx_t), cudaMemcpyHostToDevice)));
 
   check_launch_error((vec_norm2_dev<<<nb,bs>>>(v.elems_dev, temp3_dev, s_dev)));
   real *temp2;
   temp2=(real*)malloc(sizeof(real));
   to_host((void*)temp2, (void*)s_dev, sizeof(real));
-  //check_api_error((cudaMemcpy(temp2, s.elems_dev, sizeof(real),cudaMemcpyHostToDevice)));
-  printf("s to dev, succeed!:%f",*temp2);
 
   return *temp2; 
   /*real s = 0.0;
